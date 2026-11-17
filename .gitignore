@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__/
+*.pyc
+.env
+.env.*
+*.token
+*.pem
+*.key
+od_*
+state/*.db
+backtest/runs/
+dist/

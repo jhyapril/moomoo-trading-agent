@@ -1,0 +1,82 @@
+# 比赛策略的全部数值参数。
+# 护栏：解析出的账户不匹配下列值时必须拒绝交易。
+# config.yaml 只能收紧 skill 的默认上限，永远不能放宽。
+# 本文件是数字的唯一来源；STRATEGY.md 只引用这些键，不得重复具体数值。
+
+account:                                      # 账户固定：任一项对不上就整场停手
+  expected_account_id: "5829943"              # 比赛模拟账户 id
+  market_id: 100                              # 100 = 美股市场
+  require_account_type: 2                     # 2 = 比赛/模拟业务账户
+  require_title_contains: "Qoder"             # 账户名必须包含的比赛标记
+  paper_only: true                            # 只允许模拟盘，禁止实盘接口
+
+universe:                                     # 可交易范围
+  # 股票 sleeve：只做多，按收盘信号入场
+  symbols: ["US.AAPL", "US.MSFT", "US.NVDA", "US.AMD", "US.AVGO",
+            "US.META", "US.GOOGL", "US.MU", "US.SPY", "US.QQQ",
+            "US.TSLA", "US.AMZN", "US.ISRG", "US.KO", "US.APP",
+            "US.TCOM", "US.NFLX", "US.SHOP", "US.UBER", "US.CLS",
+            "US.CRWV", "US.CRWD", "US.RKLB", "US.HOOD", "US.OSCR",
+            "US.SMCI", "US.MRVL", "US.ARM", "US.TSM", "US.SNDK"]
+  options:                                    # 指数期权 sleeve
+    underlying: ["XSP"]                       # 期权标的；XSP 不做股票
+    structures: ["bull_call_spread", "bear_put_spread"]   # 只允许 defined-risk 垂直价差
+  max_open_positions: 8                       # 两个 sleeve 合计的最大并发持仓数
+
+sizing:                                       # 仓位与杠杆
+  # 股数 = (账户权益 * risk_per_trade_pct) / 每股止损距离
+  risk_per_trade_pct: 0.01                    # 单笔最大风险，0.5–1% 区间的上限
+  max_position_pct: 0.20                      # 单只上限，占 total_asset
+  max_total_exposure_pct: 0.85                # 总持仓市值上限，占 total_asset
+  max_leverage: 1.0                           # 杠杆上限；账户允许 2.0，先用 1.0
+  min_cash_buffer_pct: 0.10                   # 下单后必须保留的现金比例
+
+signal:                                       # 股票入场信号阈值（按收盘价判定）
+  ma_fast: 20                                 # 快速均线周期
+  ma_slow: 50                                 # 慢速均线周期，兼作趋势过滤与逻辑失效线
+  breakout_lookback_days: 20                  # 突破窗口：收盘需高于近 N 日最高价
+  volume_lookback_days: 20                    # 均量计算窗口
+  volume_multiple: 1.2                        # 成交量至少为均量的倍数
+  rsi_max: 75                                 # RSI 上限，超过视为过热
+  bb_period: 20                               # 布林带周期，用于计算 %B
+  bb_stddev: 2.0                              # 布林带标准差倍数
+  percent_b_max: 1.0                          # %B 上限；1.0 = 收盘不得高于上轨
+  macd_cross_max_age_days: 2                  # MACD 金叉最多在 N 天内有效
+  earnings_blackout_days: 3                   # 财报前 N 天内不开新仓
+
+options:                                      # XSP 垂直价差参数
+  min_days_to_expiry: 7                       # 剩余到期天数下限；不做 0DTE
+  max_rsi: 75                                 # bull call spread 入场 RSI 上限
+  min_rsi: 25                                 # bear put spread 入场 RSI 下限
+
+risk:                                         # 账户级风控
+  max_daily_loss_pct: 0.03                    # 单日亏损上限（已实现 + 未实现）；等于 skill 默认上限，放宽需同步改 skill
+  max_drawdown_pct: 0.10                      # 相对峰值权益的回撤上限
+  per_trade_stop_pct: 0.05                    # 单笔止损硬上限，相对平均成本
+  max_consecutive_failed_breakouts: 3         # 连续假突破 N 次即停手复盘
+  failed_breakout_window_days: 2              # 入场后 N 日内止损或逻辑失效算假突破
+  max_orders_per_day: 20                      # 每日订单上限，含撤单
+  cooldown_after_stop_minutes: 60             # 止损后同标的的冷却时间
+
+exits:                                        # 出场参数
+  stock:                                      # 股票 sleeve
+    stop_atr_period: 14                       # ATR 周期
+    stop_atr_mult: 2.0                        # 止损 = min(per_trade_stop_pct, 倍数 * ATR / 价格)
+    take_profit_pct: 0.10                     # 止盈目标，相对平均成本
+    max_holding_days: 10                      # 时间止损：最多持有 N 个交易日
+    thesis_exit_ma: 50                        # 收盘跌破该均线即逻辑失效出场
+  options:                                    # 期权 sleeve
+    stop_loss_pct_of_debit: 0.50              # 亏损达到净借方的该比例即出场
+    take_profit_multiple: 2.0                 # 价差价值达到净借方的该倍数即出场
+    close_before_expiry_days: 3               # 到期前 N 个交易日强制平仓
+    thesis_exit_ma: 50                        # 标的收盘反向突破该均线即出场
+
+cadence:                                      # 运行节奏
+  timezone: "America/New_York"                # 所有时间按纽约时间解释
+  entry_window: ["09:35", "15:30"]            # 允许开新仓的时间窗；TODO: 对照 market_state 确认
+  flatten_by: null                            # 强制清仓时点；日内填 "15:55"，波段填 null
+
+journal:                                      # 每日 journal 要求
+  # 每条记录必须包含的字段
+  required_fields: [decisions, orders, fills, pnl, rule_violations]
+  commit_after_run: true                      # 每次运行后提交 journal

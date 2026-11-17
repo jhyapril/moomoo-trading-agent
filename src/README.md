@@ -37,3 +37,16 @@ preflight -> reconcile -> evaluate_exits -> evaluate_entries -> journal -> exit
 
 - 提供 `--dry-run`：只输出意图，不发送。首次模拟盘运行必须在 dry run 与回测 journal
   对得上之后才进行。
+
+## 扫描工具
+
+`src/scan.py` — 日线计划仓位扫描（`STRATEGY.md` §4.1），无第三方依赖。
+
+```bash
+python3 src/scan.py --out journal/scan-YYYY-MM-DD.csv < /tmp/bars.json
+```
+
+输入一行 JSON：`{"cfg": <config.signal>, "bars": {"US.AAPL": {"c": [...], "h": [...], "l": [...], "v": [...]}}}`
+（按时间升序，最后一根为评估日）。阈值全部来自 `cfg`，代码里不写死数值；`l` 缺失时
+`atr` 列为空。输出 CSV（每行一只标的，`planned` 为结论）+ 一行汇总到 stderr。
+

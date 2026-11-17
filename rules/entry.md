@@ -31,8 +31,10 @@
    突破晚于 `entry.late_breakout_after` 时，按 §4.4 只走冲高或收盘确认。
 4. **确认加仓（次日）** — 在 `entry.confirm_eval_at` 按 §4.3：仍在突破位上方且 §4.1 全部
    条件（含量比）成立，才补 `entry.confirm_ratio`；否则不加，转出场流程。
-5. **成本** — 目标幅度必须显著大于往返成本（佣金 + 点差 + 滑点）。门槛倍数由 `backtest/`
-   给出；**未给出前本项判为不通过**，fail closed，不猜数字。
+5. **成本** — 按 `backtest/cost-model.md` 的公式，用实时盘口点差 + `cost` 块费率 + 滑点、
+   以该笔拟下单股数算往返成本；`exits.stock.take_profit_pct` 须 ≥
+   `cost.min_edge_cost_multiple` × 往返成本。盘口缺失/过期/买卖一为空 → 不通过。
+   期权 sleeve 在成本模型补齐前一律不通过。
 
 试探仓与确认加仓各自独立通过 Gate 0–2 的全部容量检查，各自有去重键。
 

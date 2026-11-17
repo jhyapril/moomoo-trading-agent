@@ -52,6 +52,17 @@ entry:                                        # 两段式入场：试探仓 + �
   late_breakout_after: "13:30"                # 此时点之后突破，2 小时测试在 entry_window 内做不完
   confirm_eval_at: "15:25"                    # 次日确认评估时点，用当时价近似收盘价
 
+cost:                                         # 往返成本门（rules/entry.md Gate 3.5）；推导见 backtest/cost-model.md
+  min_edge_cost_multiple: 10                  # 目标幅度必须 >= 往返成本 × 该倍数；10% 目标 => 允许成本 <= 1%
+  slippage_bps_per_side: 10                   # 每边滑点假设（bps），保守取值
+  commission_per_share: 0.0049                # 佣金，每股（美股标准费率）
+  commission_min_per_order: 0.99              # 佣金每单最低，按边计
+  platform_per_share: 0.005                   # 平台使用费，每股
+  platform_min_per_order: 1.00                # 平台费每单最低，按边计
+  sec_fee_rate: 0.00003                       # 卖出 SEC 费，按成交金额（公开费率 0.0000278，向上取整）
+  taf_per_share: 0.000166                     # 卖出交易活动费 TAF，每股
+  taf_max_per_order: 8.30                     # TAF 每单上限
+
 options:                                      # XSP 垂直价差参数
   min_days_to_expiry: 7                       # 剩余到期天数下限；不做 0DTE
   max_rsi: 75                                 # bull call spread 入场 RSI 上限

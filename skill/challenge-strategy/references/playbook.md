@@ -14,8 +14,8 @@
 5. **信号** — `STRATEGY.md` §4 的两段式判定：
    计划仓位（收盘后，§4.1）→ 试探仓（盘中，§4.2，`probe_ratio`）→
    确认加仓（次日 `confirm_eval_at`，§4.3，`confirm_ratio`）。
-6. **扣成本后的边缘** — 目标幅度相对往返成本（佣金 + 点差 + 滑点）的门槛由 `backtest/`
-   给出；未给出前该项不通过，fail closed，不猜数字。
+6. **扣成本后的边缘** — 按 `backtest/cost-model.md` 计算往返成本（点差 + 费率 + 滑点），
+   目标幅度须达到 `cost.min_edge_cost_multiple` 倍；盘口不可用即不通过。
 
 容量为零就停止。不要把一条规则缩小后再交易。
 

@@ -21,13 +21,13 @@ universe:                                     # 可交易范围
   options:                                    # 指数期权 sleeve
     underlying: ["XSP"]                       # 期权标的；XSP 不做股票
     structures: ["bull_call_spread", "bear_put_spread"]   # 只允许 defined-risk 垂直价差
-  max_open_positions: 8                       # 两个 sleeve 合计的最大并发持仓数
+  max_open_positions: 4                       # 两个 sleeve 合计的最大并发持仓数；等于 skill 硬底，只能更小
 
 sizing:                                       # 仓位与杠杆
   # 股数 = (账户权益 * risk_per_trade_pct) / 每股止损距离
   risk_per_trade_pct: 0.01                    # 单笔最大风险，0.5–1% 区间的上限
   max_position_pct: 0.20                      # 单只上限，占 total_asset
-  max_total_exposure_pct: 0.85                # 总持仓市值上限，占 total_asset
+  max_total_exposure_pct: 0.80                # 总持仓市值上限，占 total_asset；等于 skill 硬底，只能更小
   max_leverage: 1.0                           # 杠杆上限；账户允许 2.0，先用 1.0
   min_cash_buffer_pct: 0.10                   # 下单后必须保留的现金比例
 

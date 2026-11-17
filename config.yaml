@@ -44,6 +44,14 @@ signal:                                       # 股票入场信号阈值（按�
   macd_cross_max_age_days: 2                  # MACD 金叉最多在 N 天内有效
   earnings_blackout_days: 3                   # 财报前 N 天内不开新仓
 
+entry:                                        # 两段式入场：试探仓 + 确认加仓
+  probe_ratio: 0.25                           # 试探仓占计划仓位的比例
+  confirm_ratio: 0.75                         # 确认后补足的比例；probe_ratio + confirm_ratio 必须为 1
+  breakout_buffer_pct: 0.02                   # 较突破位再涨该比例即视为有效冲高（可替代 2 小时站稳）
+  hold_above_breakout_minutes: 120            # 盘中连续不收回突破位的最短分钟数
+  late_breakout_after: "13:30"                # 此时点之后突破，2 小时测试在 entry_window 内做不完
+  confirm_eval_at: "15:25"                    # 次日确认评估时点，用当时价近似收盘价
+
 options:                                      # XSP 垂直价差参数
   min_days_to_expiry: 7                       # 剩余到期天数下限；不做 0DTE
   max_rsi: 75                                 # bull call spread 入场 RSI 上限

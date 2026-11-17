@@ -10,6 +10,7 @@
 | 账户 | `account_id`、`market_id`、`account_type` 与 config 一致；title 含比赛标记 |
 | 模拟盘 | 账户为模拟账户；永不调用实盘接口 |
 | 仓位 | `order_notional <= total_asset * max_position_pct` |
+| 加仓 | 试探仓 + 确认加仓合计成本市值仍须满足上一行；加仓单独过一遍本表全部检查 |
 | 敞口 | `(current_mv + order_notional) <= total_asset * max_total_exposure_pct` |
 | 杠杆 | `(current_mv + order_notional) <= total_asset * max_leverage` |
 | 现金缓冲 | `cash_after >= total_asset * min_cash_buffer_pct` |

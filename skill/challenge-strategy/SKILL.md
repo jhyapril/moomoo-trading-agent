@@ -7,7 +7,7 @@ description: >-
   永不触碰非比赛账户。
 allowed-tools: Bash Read
 metadata:
-  version: 0.1.0
+  version: 0.2.0
   requires:
     bins:
       - moomoo
@@ -36,8 +36,8 @@ license: MIT
    任何差异都记入 journal。
 3. **出场优先** — 先按[作战手册](references/playbook.md)评估全部持仓，再考虑入场。出场永不
    因风控容量被阻塞。
-4. **入场** — 按顺序评估各道门控；发单前记录意图，去重键为 `date|symbol|rule|direction`。
-   该键已成交或在挂则跳过。
+4. **入场** — 按顺序评估各道门控；股票走"计划仓位 → 试探仓 → 次日确认加仓"两段，两笔
+   各自记录意图、各自去重，去重键为 `date|symbol|rule|direction`。该键已成交或在挂则跳过。
 5. **Journal** — 追加到当日记录：决策、订单、成交、盈亏，以及任何规则违规。没有 journal
    记录的一次运行等于没有发生。
 

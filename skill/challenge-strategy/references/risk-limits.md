@@ -5,10 +5,10 @@
 | 上限 | 默认 | 含义 |
 |---|---|---|
 | `max_position_pct` | 20% | 单只持仓，占总资产 |
-| `max_total_exposure_pct` | 80% | 总市值 / 总资产 |
+| `max_total_exposure_pct` | 90% | 总市值 / 总资产 |
 | `max_leverage` | 1.0× | 账户允许 2.0×；先无杠杆起步 |
 | `min_cash_buffer_pct` | 10% | 下单后剩余现金 |
-| `max_open_positions` | 4 | 并发标的数 |
+| `max_open_positions` | 10 | 并发标的数 |
 | `max_daily_loss_pct` | 3% | 已实现 + 未实现，对当日开盘权益 |
 | `max_drawdown_pct` | 10% | 权益对峰值权益 |
 | `per_trade_stop_pct` | 5% | 相对平均成本 |

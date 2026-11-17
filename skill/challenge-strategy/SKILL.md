@@ -7,7 +7,7 @@ description: >-
   永不触碰非比赛账户。
 allowed-tools: Bash Read
 metadata:
-  version: 0.2.0
+  version: 0.3.0
   requires:
     bins:
       - moomoo

@@ -1,0 +1,15 @@
+sym,close,ma_fast,ma_slow,prior_high,gap,vol_ratio,rsi,pb,macd_age,atr,planned,failed
+US.AAPL,351.91,347.26,340.41,360.83,-8.92,0.78,56.0,0.7,,,False,breakout|volume|macd
+US.MSFT,506.24,527.33,519.61,559.15,-52.91,1.04,41.6,0.026,,,False,close>ma_slow|breakout|volume|macd
+US.AMD,503.41,515.77,555.04,594,-90.59,1.02,46.9,0.429,,,False,close>ma_slow|ma_fast>ma_slow|breakout|volume|macd
+US.CRWD,219.58,239.36,245.31,272.29,-52.71,0.87,38.8,0.198,,,False,close>ma_slow|ma_fast>ma_slow|breakout|volume|macd
+US.NVDA,155.46,192.59,211.76,222.19,-66.73,1.84,22.4,0.08,,,False,close>ma_slow|ma_fast>ma_slow|breakout|macd
+US.TSM,359.69,403.25,427.41,440.88,-81.19,1.7,35.8,0.044,,,False,close>ma_slow|ma_fast>ma_slow|breakout|macd
+US.AVGO,341.6,331.26,344.35,369.82,-28.22,0.96,51.3,0.651,,,False,close>ma_slow|ma_fast>ma_slow|breakout|volume|macd
+US.META,618.87,629.34,680.11,713.22,-94.35,0.55,42.8,0.369,,,False,close>ma_slow|ma_fast>ma_slow|breakout|volume|macd
+US.GOOGL,280.2,297.39,325.93,344.77,-64.57,0.77,33.2,0.263,,,False,close>ma_slow|ma_fast>ma_slow|breakout|volume|macd
+US.MU,712.42,819.52,932.07,990,-277.58,1.09,37.7,0.203,,,False,close>ma_slow|ma_fast>ma_slow|breakout|volume|macd
+US.TSLA,380.11,386.26,375.49,414.23,-34.12,0.57,49.7,0.403,,,False,breakout|volume|macd
+US.ISRG,430.53,446.98,420.62,485.85,-55.32,0.94,46.6,0.172,,,False,breakout|volume|macd
+US.KO,98.79,95.33,91.26,100.56,-1.77,1.04,69.7,0.858,,,False,breakout|volume|macd
+US.APP,398.94,319.0,305.76,418.77,-19.83,0.78,67.8,0.776,,,False,breakout|volume|macd

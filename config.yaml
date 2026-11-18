@@ -93,7 +93,7 @@ exits:                                        # 出场参数
 cadence:                                      # 运行节奏
   timezone: "America/New_York"                # 所有时间按纽约时间解释
   poll_interval_minutes: 5                    # 盘中复查间隔；只对已出计划仓位的标的轮询实时价，不全量扫
-  entry_window: ["09:35", "15:30"]            # 允许开新仓的时间窗；TODO: 对照 market_state 确认
+  entry_window: ["09:30", "15:30"]            # 允许开新仓的时间窗；起点对齐开盘 09:30（2026-11-18 用户调整，原 09:35）
   flatten_by: null                            # 强制清仓时点；日内填 "15:55"，波段填 null
 
 journal:                                      # 每日 journal 要求

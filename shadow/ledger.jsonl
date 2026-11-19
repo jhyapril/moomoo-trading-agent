@@ -32,3 +32,4 @@
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1026.json", "recorded_at": "2026-11-19T15:35:01.605808+00:00"}
 {"event": "open", "book": "pm_open", "cash": 100000.0, "strategy": "信号/出场/仓位同 earn_open（现行全部规则、财报未知放行），唯一差异：只在 13:30-15:30 ET 接受新入场；用来单独量化 entry_window 起点", "recorded_at": "2026-11-19T15:35:31.314320+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1036.json", "recorded_at": "2026-11-19T15:44:34.359696+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1046.json", "recorded_at": "2026-11-19T15:55:52.845745+00:00"}

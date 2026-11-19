@@ -64,3 +64,4 @@
 {"event": "open", "book": "shrt10c", "cash": 100000.0, "strategy": "确认方式改为现行 §4.4 的收盘确认第三条路径：只在 15:25 单点评估，价仍低于 10 日低、且当日 §4.2 两条腿都未成立过才做空，一次建满；用来量化「等到收盘确认」的价格代价，与 shrt10（不入场）、shrt10p（无确认腿）三本相减", "recorded_at": "2026-11-19T19:05:30.926849+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1406.json", "recorded_at": "2026-11-19T19:13:37.932824+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1416.json", "recorded_at": "2026-11-19T19:22:44.242266+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1426.json", "recorded_at": "2026-11-19T19:29:10.780671+00:00"}

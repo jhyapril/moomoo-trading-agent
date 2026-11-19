@@ -38,3 +38,4 @@
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1118.json", "recorded_at": "2026-11-19T16:23:10.016467+00:00"}
 {"event": "open", "book": "onestk", "cash": 100000.0, "strategy": "信号/出场同 earn_open（现行全部规则、财报未知放行），唯一差异：突破当下按 §6 计划股数一次建满，取消 25% 试探与次日放量确认；单独量化两段式建仓节奏", "recorded_at": "2026-11-19T16:25:47.778669+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1126.json", "recorded_at": "2026-11-19T16:36:15.582596+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1136.json", "recorded_at": "2026-11-19T16:43:05.925478+00:00"}

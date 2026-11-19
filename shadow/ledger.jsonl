@@ -41,3 +41,5 @@
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1136.json", "recorded_at": "2026-11-19T16:43:05.925478+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1146.json", "recorded_at": "2026-11-19T17:00:00.154594+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1157.json", "recorded_at": "2026-11-19T17:08:03.670872+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1207.json", "recorded_at": "2026-11-19T17:13:01.068093+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-19/1217.json", "recorded_at": "2026-11-19T17:22:25.340963+00:00"}

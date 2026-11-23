@@ -180,3 +180,4 @@
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1356.json", "recorded_at": "2026-11-23T19:03:10.976754+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1405.json", "recorded_at": "2026-11-23T19:17:45.588670+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1415.json", "recorded_at": "2026-11-23T19:33:39.361621+00:00"}
+{"event": "fill", "book": "shrt10nw", "symbol": "US.META", "side": "buy", "qty": 34, "price": 601.6, "fees": 1.99, "filled_at": "2026-11-23T20:49:32.347000+00:00", "recorded_at": "2026-11-23T20:50:13.100609+00:00", "reason": "止损触发回补：较低卖一 601.60（ARCA）≥ 止损线 601.545 = 均价572.90+min(5%,2xATR)；NASDAQ 同批卖一 601.70，按本账本约定取多场馆较低卖一。极值口径同日高第四次刷新 601.38→602.46（+0.152% 越线）。同批包络：last 601.60 / 日高 602.46 / 昨收 560.84。", "data_ref": "mcp quote_order_book US.META num=3 exchange_data_time_ms=1795466972347 (15:49:32.347 ET) + quote_stock_quote data_time=1795466972067"}

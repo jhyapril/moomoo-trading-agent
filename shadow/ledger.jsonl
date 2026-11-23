@@ -160,3 +160,7 @@
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1055.json", "recorded_at": "2026-11-23T16:18:07.880888+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1105.json", "recorded_at": "2026-11-23T16:18:53.343043+00:00"}
 {"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1115.json", "recorded_at": "2026-11-23T16:28:12.547999+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1125.json", "recorded_at": "2026-11-23T16:37:15.859393+00:00"}
+{"event": "open", "book": "gapgo", "cash": 100000, "strategy": "突破锚定=当日跳空≥+5% 且现价守住当日高点(×0.9975)，其余逐字同 earn_open；11/23 只预演不成交", "recorded_at": "2026-11-23T16:50:54.257346+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1135.json", "recorded_at": "2026-11-23T16:51:41.698730+00:00"}
+{"event": "seen", "snapshot": "state/market-data/intraday/2026-11-23/1145.json", "recorded_at": "2026-11-23T16:51:41.735625+00:00"}

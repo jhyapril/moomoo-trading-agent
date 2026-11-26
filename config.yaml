@@ -11,13 +11,11 @@ account:                                      # 账户固定：任一项对不�
   paper_only: true                            # 只允许模拟盘，禁止实盘接口
 
 universe:                                     # 可交易范围
-  # 股票 sleeve：只做多，按收盘信号入场
+  # 股票 sleeve：只做多，盘中全量盯盘按突破信号入场
   symbols: ["US.AAPL", "US.MSFT", "US.NVDA", "US.AMD", "US.AVGO",
-            "US.META", "US.GOOGL", "US.MU", "US.SPY", "US.QQQ",
-            "US.TSLA", "US.AMZN", "US.ISRG", "US.KO", "US.APP",
-            "US.TCOM", "US.NFLX", "US.SHOP", "US.UBER", "US.CLS",
-            "US.CRWV", "US.CRWD", "US.RKLB", "US.HOOD", "US.OSCR",
-            "US.SMCI", "US.MRVL", "US.ARM", "US.TSM", "US.SNDK"]
+            "US.META", "US.GOOGL", "US.MU",
+            "US.TSLA", "US.ISRG", "US.KO", "US.APP", "US.CRWD", 
+            "US.TSM"]
   options:                                    # 指数期权 sleeve
     underlying: ["XSP"]                       # 期权标的；XSP 不做股票
     structures: ["bull_call_spread", "bear_put_spread"]   # 只允许 defined-risk 垂直价差
@@ -92,10 +90,15 @@ exits:                                        # 出场参数
 
 cadence:                                      # 运行节奏
   timezone: "America/New_York"                # 所有时间按纽约时间解释
-  poll_interval_minutes: 5                    # 盘中复查间隔；只对已出计划仓位的标的轮询实时价，不全量扫
+  poll_interval_minutes: 10                   # 盘中复查间隔；每次对 universe.symbols 全部标的取实时价判定（2026-11-18 用户改为全量盯盘，2026-11-18 收盘后改为 10 分钟）
   connector_check_at: "09:15"                 # 盘前连接器写路径测试时点；仅在 09:15–09:20 执行一次，见 rules/connector-check.md
   entry_window: ["09:30", "15:30"]            # 允许开新仓的时间窗；起点对齐开盘 09:30（2026-11-18 用户调整，原 09:35）
   flatten_by: null                            # 强制清仓时点；日内填 "15:55"，波段填 null
+
+shadow:                                       # 影子交易员（独立虚拟账本，零真实订单，目的是优化现行策略；2026-11-19 用户要求）
+  default_book_cash: 100000                   # 新开虚拟账本的默认起始资金（与比赛账户同口径，便于对比）
+  late_fill_minutes: 15                       # 记录时间晚于假设成交时间超过此分钟数即标为补记，不计入前瞻样本
+  snapshot_dir: "state/market-data/intraday"  # 负责人每轮原子存档数据员快照、收盘存档分钟线的目录（不进 git），影子交易员异步读取
 
 journal:                                      # 每日 journal 要求
   # 每条记录必须包含的字段

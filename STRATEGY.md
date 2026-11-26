@@ -4,7 +4,7 @@
 
 ## §1 论点
 
-大盘趋势向上时，买入收盘突破近期新高、站上长期均线的高流动性股票，持有至多 `exits.stock.max_holding_days` 个交易日，赚动量延续。入场分两段：盘中试探 `entry.probe_ratio`，次日收盘确认后再加 `entry.confirm_ratio`——启动日不缺席，假突破也只亏试探仓那部分。期权 sleeve 只做 XSP 的 defined-risk 价差（多腿单已实测可用），不做裸卖、不做 0DTE。LLM 只做信号筛选与复盘，不直接下单；所有订单走代码门控与风控检查。
+大盘趋势向上时，买入盘中突破近期新高、站上长期均线的高流动性股票，持有至多 `exits.stock.max_holding_days` 个交易日，赚动量延续。盘中对 `universe.symbols` 全部标的轮询，不再要求前一日收盘已入选计划。入场分两段：盘中试探 `entry.probe_ratio`，次日确认后再加 `entry.confirm_ratio`——启动日不缺席，假突破也只亏试探仓那部分。期权 sleeve 只做 XSP 的 defined-risk 价差（多腿单已实测可用），不做裸卖、不做 0DTE。数据、风控和研究 Agent 只提交分析；订单仅由唯一执行者按 Skill 门控与风控检查发送。目前执行由提示词与 Skill 编排，不把它描述为已实现的代码交易引擎。
 
 ## §2 标的与周期
 
@@ -29,39 +29,38 @@
 股票 sleeve 采用两段式入场：先试探、后确认。目的是启动日不缺席，同时把假突破的代价压到
 计划仓位的 `entry.probe_ratio`。
 
-### 4.1 计划仓位（收盘后判定）
+### 4.1 盘中资格（每次运行对全部标的判定）
 
-收盘后按下列条件筛出"计划仓位"资格，全部满足才成立：
+2026-11-18 用户决定：盘中直接盯 `universe.symbols` 全部标的，不再以"前一日收盘已突破"作为
+前置计划。每次运行用截止上一交易日的已收盘日线加本次实时价（视作当日临时收盘）判定：
 
-1. 收盘价 > MA`signal.ma_slow`，且 MA`signal.ma_fast` > MA`signal.ma_slow`
-2. 收盘突破近 `signal.breakout_lookback_days` 日最高价；该最高价记为**突破位**
-3. 成交量 ≥ `signal.volume_lookback_days` 日均量 × `signal.volume_multiple`
-4. RSI < `signal.rsi_max`，且 %B ≤ `signal.percent_b_max`（BB `signal.bb_period` 日、`signal.bb_stddev` 倍标准差）
-5. MACD 金叉在 `signal.macd_cross_max_age_days` 天内，**或**收盘突破阻力
-6. 财报在 `signal.earnings_blackout_days` 天内不进（例：NVDA 2026-11-17 盘后财报，当天不进 NVDA）
+1. **突破位** = 近 `signal.breakout_lookback_days` 个已收盘交易日的最高价
+2. 实时价 > MA`signal.ma_slow`，且 MA`signal.ma_fast` > MA`signal.ma_slow`（均线含实时价）
+3. RSI < `signal.rsi_max`，且 %B ≤ `signal.percent_b_max`（BB `signal.bb_period` 日、`signal.bb_stddev` 倍标准差，含实时价）
+4. 财报在 `signal.earnings_blackout_days` 天内不进；查不到财报日同样不进（fail closed）
+5. ATR`exits.stock.stop_atr_period` 可由已收盘日线算出（止损与股数需要）
+6. 已持有该标的、或在 `risk.cooldown_after_stop_minutes` 止损冷却内，不再建试探仓
 
-计划仓位的股数按 §6 算，是**上限**，不是立即买入 100%。
+计划仓位股数在触发时按 §6 算，是**上限**，不是立即买入 100%。判定由 `src/watch.py` 完成。
 
-> 第 2 条已强制突破，所以第 5 条的 OR 分支恒真，MACD 目前不构成独立过滤。若回测要它成为
-> 独立门控，改成 AND 后再比较，不允许口头放宽或口头收紧。
+> 量比与 MACD 不在盘中资格内：盘中量能不可靠，量比留给次日确认；MACD 原本是"金叉或突破"
+> 的 OR 条件，突破已强制，故不构成独立过滤。
 
 ### 4.2 试探仓（计划仓位 × `entry.probe_ratio`）
 
-盘中同时满足以下条件即建试探仓：
+§4.1 全部成立时，满足任一条即建试探仓：
 
-1. 盘中价 > 突破位
-2. 且满足任一条：
-   - 连续 `entry.hold_above_breakout_minutes` 分钟不收回突破位；或
-   - 盘中价 ≥ 突破位 × (1 + `entry.breakout_buffer_pct`)
-3. 同组过滤仍在：价 > MA`signal.ma_slow`、MA`signal.ma_fast` > MA`signal.ma_slow`、
-   RSI < `signal.rsi_max`、%B ≤ `signal.percent_b_max`、无财报禁入
-4. **不要求** `signal.volume_multiple` 量比——盘中量能不可靠，量比留给次日确认
+- 连续 `entry.hold_above_breakout_minutes` 分钟（1 分钟收盘价）不收回突破位；或
+- 实时价 ≥ 突破位 × (1 + `entry.breakout_buffer_pct`)
+
+**不要求** `signal.volume_multiple` 量比。
 
 ### 4.3 确认加仓（补足 `entry.confirm_ratio`）
 
 次日 `entry.confirm_eval_at` 用当时价近似收盘价评估：
 
-- 价格仍在突破位上方，**且** §4.1 全部条件（含量比）成立 → 加满剩余 `entry.confirm_ratio`
+- 价格仍在原突破位上方，**且** §4.1 第 2–4 条成立，**且**当日累计量 ≥
+  `signal.volume_lookback_days` 日均量 × `signal.volume_multiple` → 加满剩余 `entry.confirm_ratio`
 - 任一条不成立 → 不加仓；试探仓转由 §5 常规管理。不得下调门槛，不得补仓摊薄
 
 ### 4.4 时间约束
@@ -129,5 +128,15 @@ XSP vertical 出场：
 ## §8 复盘节奏
 
 - 每天收盘后写 journal/YYYY-MM-DD.md：决策、订单、成交、盈亏、违规
+- 影子交易员独立运作（2026-11-19 用户要求）：有自己的定时任务，不占用买入决策会话；协调者每轮把
+  数据员的价格数据无条件存档到快照目录，影子交易员异步读取，也可自行读取全部缓存与行情；在 `shadow/`
+  自建多个虚拟账本，各自代表一套策略，用假设买卖成交记账，不受现行策略门控与风控上限约束，目的是
+  为优化本策略提供对照。唯一边界：零真实订单、不改正式策略文件。
+  账本与笔记契约见 Skill 作战手册的影子研究部分。
+- 盘后影子交易员在自己的复盘任务中对比各账本与比赛账户同期收益扣费用、回撤、交易次数与胜率，
+  指出导致差异的规则，给出具体改进建议，写在 `shadow/notes/`；协调者收盘任务只提供比赛账户对照数据。
+- 影子账本只追加到 `shadow/ledger.jsonl`；保留亏损、放弃的账本和补记成交标记，不只报赢家。
+- 研究结论仅分保留、继续观察、建议验证。先积累样本，冻结改动候选并做独立样本外验证；
+  用户批准后才修改正式策略和 Skill 版本。比赛窗口短，不把几次成功或账本汇总当盈利验证。
 - 每周复盘一次：胜率、盈亏比、假突破次数、风控触发情况
 - 比赛结束（11/28）后写总结：策略是否有效、哪些条件要改、能否复用到实盘

@@ -1,0 +1,5 @@
+order_id,created_et,symbol,side,qty,limit_price,avg_fill_price,cum_qty,status,text,note
+3246050,2026-11-17 01:23:58,US.NVDA,BUY,1,100.00,0,0,cancelled,validation-order,"写路径验证单，01:24:14 ET 撤销（挂单 16 秒），0 股成交"
+3246054,2026-11-17 01:25:50,US.NVDA,BUY,10,155.10,155.10,10,filled,user-discretionary,"用户指定仓（非策略信号入场），11/17 09:37:03 ET 全部成交 10 @ 155.10"
+3249625,2026-11-18 09:23:54,US.KO,BUY,1,85.00,0,0,cancelled,connector auth test; cancel immediately,"连接器鉴权测试单，09:24:16 ET 撤销（挂单 22 秒），0 股成交"
+3254277,2026-11-19 14:58:39,US.NVDA,SELL,10,147.25,147.28,10,filled,2026-11-19|US.NVDA|stop|short,"rules/exit.md 优先级 1 硬止损（止损线 147.345）；14:58:42 ET 全部成交 10 @ 147.28，较限价 +0.03"

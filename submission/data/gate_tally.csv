@@ -1,0 +1,6 @@
+gate,blocked_evaluations,share_of_1260
+price>breakout,1246,98.89%
+earnings,1073,85.16%
+price>ma_slow,863,68.49%
+ma_fast>ma_slow,717,56.90%
+missing_live_price,14,1.11%

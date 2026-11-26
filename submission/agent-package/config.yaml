@@ -1,0 +1,106 @@
+# 比赛策略的全部数值参数。
+# 护栏：解析出的账户不匹配下列值时必须拒绝交易。
+# config.yaml 只能收紧 skill 的默认上限，永远不能放宽。
+# 本文件是数字的唯一来源；STRATEGY.md 只引用这些键，不得重复具体数值。
+
+account:                                      # 账户固定：任一项对不上就整场停手
+  expected_account_id: "5829943"              # 比赛模拟账户 id
+  market_id: 100                              # 100 = 美股市场
+  require_account_type: 2                     # 2 = 比赛/模拟业务账户
+  require_title_contains: "Qoder"             # 账户名必须包含的比赛标记
+  paper_only: true                            # 只允许模拟盘，禁止实盘接口
+
+universe:                                     # 可交易范围
+  # 股票 sleeve：只做多，盘中全量盯盘按突破信号入场
+  symbols: ["US.AAPL", "US.MSFT", "US.NVDA", "US.AMD", "US.AVGO",
+            "US.META", "US.GOOGL", "US.MU",
+            "US.TSLA", "US.ISRG", "US.KO", "US.APP", "US.CRWD", 
+            "US.TSM"]
+  options:                                    # 指数期权 sleeve
+    underlying: ["XSP"]                       # 期权标的；XSP 不做股票
+    structures: ["bull_call_spread", "bear_put_spread"]   # 只允许 defined-risk 垂直价差
+  max_open_positions: 8                       # 两个 sleeve 合计的最大并发持仓数；skill 硬底 10，只能更小
+
+sizing:                                       # 仓位与杠杆
+  # 股数 = (账户权益 * risk_per_trade_pct) / 每股止损距离
+  risk_per_trade_pct: 0.01                    # 单笔最大风险，0.5–1% 区间的上限
+  max_position_pct: 0.20                      # 单只上限，占 total_asset
+  max_total_exposure_pct: 0.80                # 总持仓市值上限，占 total_asset；skill 硬底 0.90，此处更紧
+  max_leverage: 1.0                           # 杠杆上限；账户允许 2.0，先用 1.0
+  min_cash_buffer_pct: 0.10                   # 下单后必须保留的现金比例
+
+signal:                                       # 股票入场信号阈值（按收盘价判定）
+  ma_fast: 20                                 # 快速均线周期
+  ma_slow: 50                                 # 慢速均线周期，兼作趋势过滤与逻辑失效线
+  breakout_lookback_days: 20                  # 突破窗口：收盘需高于近 N 日最高价
+  volume_lookback_days: 20                    # 均量计算窗口
+  volume_multiple: 1.2                        # 成交量至少为均量的倍数
+  rsi_max: 75                                 # RSI 上限，超过视为过热
+  bb_period: 20                               # 布林带周期，用于计算 %B
+  bb_stddev: 2.0                              # 布林带标准差倍数
+  percent_b_max: 1.0                          # %B 上限；1.0 = 收盘不得高于上轨
+  macd_cross_max_age_days: 2                  # MACD 金叉最多在 N 天内有效
+  earnings_blackout_days: 3                   # 财报前 N 天内不开新仓
+
+entry:                                        # 两段式入场：试探仓 + 确认加仓
+  probe_ratio: 0.25                           # 试探仓占计划仓位的比例
+  confirm_ratio: 0.75                         # 确认后补足的比例；probe_ratio + confirm_ratio 必须为 1
+  breakout_buffer_pct: 0.02                   # 较突破位再涨该比例即视为有效冲高（可替代 2 小时站稳）
+  hold_above_breakout_minutes: 120            # 盘中连续不收回突破位的最短分钟数
+  late_breakout_after: "13:30"                # 此时点之后突破，2 小时测试在 entry_window 内做不完
+  confirm_eval_at: "15:25"                    # 次日确认评估时点，用当时价近似收盘价
+
+cost:                                         # 往返成本门（rules/entry.md Gate 3.5）；推导见 backtest/cost-model.md
+  min_edge_cost_multiple: 10                  # 目标幅度必须 >= 往返成本 × 该倍数；10% 目标 => 允许成本 <= 1%
+  slippage_bps_per_side: 10                   # 每边滑点假设（bps），保守取值
+  commission_per_share: 0.0049                # 佣金，每股（美股标准费率）
+  commission_min_per_order: 0.99              # 佣金每单最低，按边计
+  platform_per_share: 0.005                   # 平台使用费，每股
+  platform_min_per_order: 1.00                # 平台费每单最低，按边计
+  sec_fee_rate: 0.00003                       # 卖出 SEC 费，按成交金额（公开费率 0.0000278，向上取整）
+  taf_per_share: 0.000166                     # 卖出交易活动费 TAF，每股
+  taf_max_per_order: 8.30                     # TAF 每单上限
+
+options:                                      # XSP 垂直价差参数
+  min_days_to_expiry: 7                       # 剩余到期天数下限；不做 0DTE
+  max_rsi: 75                                 # bull call spread 入场 RSI 上限
+  min_rsi: 25                                 # bear put spread 入场 RSI 下限
+
+risk:                                         # 账户级风控
+  max_daily_loss_pct: 0.03                    # 单日亏损上限（已实现 + 未实现）；等于 skill 默认上限，放宽需同步改 skill
+  max_drawdown_pct: 0.10                      # 相对峰值权益的回撤上限
+  per_trade_stop_pct: 0.05                    # 单笔止损硬上限，相对平均成本
+  max_consecutive_failed_breakouts: 3         # 连续假突破 N 次即停手复盘
+  failed_breakout_window_days: 2              # 入场后 N 日内止损或逻辑失效算假突破
+  max_orders_per_day: 20                      # 每日订单上限，含撤单
+  cooldown_after_stop_minutes: 60             # 止损后同标的的冷却时间
+
+exits:                                        # 出场参数
+  stock:                                      # 股票 sleeve
+    stop_atr_period: 14                       # ATR 周期
+    stop_atr_mult: 2.0                        # 止损 = min(per_trade_stop_pct, 倍数 * ATR / 价格)
+    take_profit_pct: 0.10                     # 止盈目标，相对平均成本
+    max_holding_days: 10                      # 时间止损：最多持有 N 个交易日
+    thesis_exit_ma: 50                        # 收盘跌破该均线即逻辑失效出场
+  options:                                    # 期权 sleeve
+    stop_loss_pct_of_debit: 0.50              # 亏损达到净借方的该比例即出场
+    take_profit_multiple: 2.0                 # 价差价值达到净借方的该倍数即出场
+    close_before_expiry_days: 3               # 到期前 N 个交易日强制平仓
+    thesis_exit_ma: 50                        # 标的收盘反向突破该均线即出场
+
+cadence:                                      # 运行节奏
+  timezone: "America/New_York"                # 所有时间按纽约时间解释
+  poll_interval_minutes: 10                   # 盘中复查间隔；每次对 universe.symbols 全部标的取实时价判定（2026-11-18 用户改为全量盯盘，2026-11-18 收盘后改为 10 分钟）
+  connector_check_at: "09:15"                 # 盘前连接器写路径测试时点；仅在 09:15–09:20 执行一次，见 rules/connector-check.md
+  entry_window: ["09:30", "15:30"]            # 允许开新仓的时间窗；起点对齐开盘 09:30（2026-11-18 用户调整，原 09:35）
+  flatten_by: null                            # 强制清仓时点；日内填 "15:55"，波段填 null
+
+shadow:                                       # 影子交易员（独立虚拟账本，零真实订单，目的是优化现行策略；2026-11-19 用户要求）
+  default_book_cash: 100000                   # 新开虚拟账本的默认起始资金（与比赛账户同口径，便于对比）
+  late_fill_minutes: 15                       # 记录时间晚于假设成交时间超过此分钟数即标为补记，不计入前瞻样本
+  snapshot_dir: "state/market-data/intraday"  # 负责人每轮原子存档数据员快照、收盘存档分钟线的目录（不进 git），影子交易员异步读取
+
+journal:                                      # 每日 journal 要求
+  # 每条记录必须包含的字段
+  required_fields: [decisions, orders, fills, pnl, rule_violations]
+  commit_after_run: true                      # 每次运行后提交 journal
